@@ -3,10 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>養殖シミュレーター</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
-    <h1>チーズアカデミー</h1>
+    <!-- ===== 入力フォーム ===== -->
+    <input id="name"         placeholder="シナリオ名"><br> <!-- placeholder は入力欄が空のときに薄く表示される説明用テキスト（実際の値ではない）。 -->
+    <input id="fishCount"    placeholder="匹数"            type="number"><br><!-- type="number" にすると「数値専用入力」。矢印で +/– できるし、スマホでは数字キーボードが出る。 -->
+    <input id="harvestWeight"placeholder="出荷体重(kg/尾)" type="number" step="0.01"><br> <!-- 小数点入力の刻み幅。step="0.1" にすれば 0.1 刻み。省略すれば整数刻み。 -->
+    <input id="seedPrice"    placeholder="種苗単価($/尾)"  type="number" step="0.0001"><br>
+    <input id="feedPrice"    placeholder="餌単価($/kg)"    type="number" step="0.01"><br>
+    <input id="fcr"          placeholder="FCR"             type="number" step="0.1"><br>
+    <input id="survival"     placeholder="生存率(%)"       type="number" step="10"><br>
+    <input id="salePrice"    placeholder="販売単価($/kg)"  type="number" step="0.01"><br>
+
+    <button id="save">保存</button>
+    <button id="clear">全削除</button>
+
+    <!-- ===== 一覧表 ===== -->
+    <table id="scenarioTable">
+    <thead><tr><th>名前</th><th>粗利益($)</th></tr></thead>
+    <tbody></tbody>
+    </table>
+
+    <script src="app.js"></script>
     
 </body>
 </html>
