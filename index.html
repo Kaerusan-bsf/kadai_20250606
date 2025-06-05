@@ -8,6 +8,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
+    <h1>養殖シミュレーター</h1>
     <!-- ===== 入力フォーム ===== -->
     <input id="name"         placeholder="シナリオ名"><br> <!-- placeholder は入力欄が空のときに薄く表示される説明用テキスト（実際の値ではない）。 -->
     <input id="fishCount"    placeholder="匹数"            type="number"><br><!-- type="number" にすると「数値専用入力」。矢印で +/– できるし、スマホでは数字キーボードが出る。 -->
@@ -23,11 +24,125 @@
 
     <!-- ===== 一覧表 ===== -->
     <table id="scenarioTable">
-    <thead><tr><th>名前</th><th>粗利益($)</th></tr></thead>
-    <tbody></tbody>
+        <thead><!-- “表の見出し” エリア。スクリーンリーダーや固定ヘッダー表示で使われる。 -->
+            <tr><!-- table row = 1 行を表すタグ。 -->
+                <th>名前</th><!-- table header cell = 見出しセル。太字 & 中央寄せがデフォルト。データセル <td> とペア -->
+                <th>売上($)</th>
+                <th>種苗代($)</th>
+                <th>餌代($)</th>
+                <th>粗利益($)</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
     </table>
 
-    <script src="app.js"></script>
+    <script>
+        // データを保存するときの処理
+        $('#save').on('click',function(){
+            const data = {
+                name: $('#name').val(),
+                fishCount: +$('#fishCount').val(),
+                harvestWeight: +$('#harvestWeight').val(),
+                seedPrice: +$('#seedPrice').val(),
+                feedPrice: +$('#feedPrice').val(),
+                fcr: +$('#fcr').val(),
+                survival: +$('#survival').val(),
+                salePrice: +$('#salePrice').val(),
+                // 使う前に 数値化（+, Number(), parseFloat() など）すれば計算は正常
+
+            };
+
+            const marketable = data.fishCount*(data.survival/100);// 出荷尾数
+            const harvestKg = data.harvestWeight*marketable;// 出荷総重量
+            const feedKg = harvestKg * data.fcr;// 餌消費量
+            const seedCost = data.seedPrice * data.fishCount;// 種苗代
+            const feedCost = feedKg * data.feedPrice;// 餌代
+            const revenue = harvestKg * data.salePrice;// 売上
+            const profit = revenue - feedCost - seedCost;// 粗利益
+            // + で足すと “連結” になる → "10" + "1" → "101"使う前に 数値化（+, Number(), parseFloat() など）すれば計算は正常
+
+            data.revenue = revenue;
+            data.seedCost = seedCost;
+            data.feedCost = feedCost;
+            data.profit = profit;// オブジェクトに追加
+
+
+            console.log(data);
+
+            $('#scenarioTable tbody').append(
+                `<tr>
+                    <td>${data.name}</td>
+                    <td>${data.revenue}</td>
+                    <td>${data.seedCost}</td>
+                    <td>${data.feedCost}</td>
+                    <td>${data.profit}</td>
+                </tr>`
+                
+            //     append() に生の <tr> タグを書くだけでは JavaScript が「これはコードなの？文字なの？」と判別できず構文エラーになります。
+            //     jQuery が受け取れるのは “文字列” か “jQuery オブジェクト” です。
+            //     だから かならず引用符（シングル '、ダブル "、またはバッククォート `）で囲んで “ただの文字列” にして渡す必要があります。
+            // ""や''では変数展開ができない。``は変数展開できる。
+            );
+            // <tr>                                 <!-- 新しい行 -->
+            //     <td>${data.name}</td>            <!-- 1 列目：シナリオ名 -->
+            //     <td>${profit.toFixed(2)}</td>    <!-- 2 列目：粗利益 -->
+            // </tr>
+            
+            $('input').val('');// 入力欄をクリア
+
+            const json = JSON.stringify(data);
+            console.log(json);
+            localStorage.setItem('simulationdata' ,json);
+
+            
+
+        });
+        
+        // データを削除するときの処理
+        $('#clear').on('click',function(){
+            localStorage.removeItem('simulationdata');
+            $('#name').val('');
+            $('#fishCount').val('');
+            $('#harvestWeight').val('');
+            $('#seedPrice').val('');
+            $('#feedPrice').val('');
+            $('#fcr').val('');
+            $('#survival').val('');
+            $('#salePrice').val('');
+
+        });
+       
+        // データが存在するときだけデータを取り出して表示するときの処理
+        if(localStorage.getItem('simulationdata')){
+            const json = localStorage.getItem('simulationdata');
+            console.log(json);
+            const data = JSON.parse(json);
+            console.log(data);
+            $('#name').val(data.name);
+            $('#fishCount').val(data.fishCount);
+            $('#harvestWeight').val(data.harvestWeight);
+            $('#seedPrice').val(data.seedPrice);
+            $('#feedPrice').val(data.feedPrice);
+            $('#fcr').val(data.fcr);
+            $('#survival').val(data.survival);
+            $('#salePrice').val(data.salePrice);
+
+            $('#scenarioTable tbody').append(
+                `<tr>
+                    <td>${data.name}</td>
+                    <td>${data.revenue}</td>
+                    <td>${data.seedCost}</td>
+                    <td>${data.feedCost}</td>
+                    <td>${data.profit}</td>
+                </tr>`
+            );     
+        }
+
+
+
+    </script>
     
 </body>
 </html>
