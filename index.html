@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
+<!-- CDN を <head> の下か <body> の最後に追加 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+
 <body>
     <h1>養殖シミュレーター</h1>
     <!-- ===== 入力フォーム ===== -->
@@ -37,9 +42,14 @@
 
         </tbody>
     </table>
+    <!-- 表のすぐ下にキャンバスを１枚 -->
+    <canvas id="costChart" width="360" height="360"></canvas>
 
     <script>
         // データを保存するときの処理
+        let costChart; 
+        // let costChart; が クリック関数の中にある	ボタンを押すたびに 新しいローカル変数 が作られ、直後に destroy() で参照しているのは 前回の costChart ではない → キャンセルできず表示もされない
+
         $('#save').on('click',function(){
             const data = {
                 name: $('#name').val(),
@@ -68,6 +78,7 @@
             data.feedCost = feedCost;
             data.profit = profit;// オブジェクトに追加
 
+            const total = data.revenue;// 売上＝100 %
 
             console.log(data);
 
@@ -90,6 +101,8 @@
             //     <td>${profit.toFixed(2)}</td>    <!-- 2 列目：粗利益 -->
             // </tr>
             
+            
+
             $('input').val('');// 入力欄をクリア
 
             const json = JSON.stringify(data);
@@ -97,6 +110,44 @@
             localStorage.setItem('simulationdata' ,json);
 
             
+            const ctx = document.getElementById('costChart');// キャンバス取得は # を外す
+
+            if (costChart) {
+                costChart.destroy();
+            }
+
+            costChart = new Chart(ctx, {
+                type: 'doughnut',// 円グラフ
+                data: {
+                    labels: ['種苗代', '餌代', '粗利益'],
+                    datasets: [{
+                        data: [data.seedCost, data.feedCost, data.profit],
+                        backgroundColor: ['#fcd34d', '#34d399', '#f87171'],  // 4 色
+                        borderWidth: 1
+                    }]
+                },
+                plugins: [ChartDataLabels],   // ← 追加したプラグインを有効化
+                options:{ 
+                    cutout: '50%',              // ドーナツの穴サイズ（% or px）
+                    plugins:{
+                        title: {  // タイトル
+                            display: true,
+                            text: `${data.name} のコスト内訳`,
+                            font: { size: 18 }
+                        },
+                        legend: { // 凡例
+                            position: 'bottom',
+                            labels: { padding: 15, boxWidth: 18 }
+                        },
+                        datalabels: {
+                            formatter: v => `${(v / total * 100).toFixed(1)}%`,  // ← % だけ表示
+                            color: '#fff',                                        // 文字色
+                            font: { weight: 'bold', size: 14 }                    // 太字・サイズ
+                        }
+                    }
+                
+                }
+            });
 
         });
         
