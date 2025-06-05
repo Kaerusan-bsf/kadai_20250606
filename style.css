@@ -1,0 +1,25 @@
+body{
+    font-family:sans-serif;
+    margin:20px;
+    background:#f4f6f8;
+}
+
+input{
+    margin:4px 0;
+    padding:4px;width:250px;
+}
+
+button{
+    margin:4px 4px 8px 0;
+    padding:6px 12px;
+}
+
+table{
+    border-collapse:collapse;
+    margin-top:8px;
+}
+th,td{
+    border:1px solid #ccc;
+    padding:4px 8px;
+    text-align:center;
+}
