@@ -23,3 +23,16 @@ th,td{
     padding:4px 8px;
     text-align:center;
 }
+
+.layout{
+    display: flex;
+    gap:24px; 
+}
+
+.right{
+    justify-content: center;
+}
+
+@media(max-width:768px){ /* 条件：「ビューポートの幅が 768 px 以下のときにだけ下のルールを適用せよ」→ おもにスマホ縦向き〜小さめタブレットの幅 */
+    .layout{ flex-direction:column; }
+}
